@@ -20,5 +20,7 @@ namespace QandA.Data
 
         void DeleteQuestion(int questionId);
         AnswerGetResponse PostAnswer(AnswerPostFullRequest answer);
+
+        IEnumerable<QuestionGetManyResponse> GetQuestionsWithAnswers();
     }
 }
