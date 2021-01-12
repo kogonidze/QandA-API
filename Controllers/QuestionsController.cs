@@ -17,11 +17,13 @@ namespace QandA.Controllers
     {
         private readonly IDataRepository _dataRepository;
         private readonly IHubContext<QuestionsHub> _questionHubContext;
+        private readonly IQuestionCache _cache;
 
-        public QuestionsController(IDataRepository dataRepository, IHubContext<QuestionsHub> questionHubContext)
+        public QuestionsController(IDataRepository dataRepository, IHubContext<QuestionsHub> questionHubContext, IQuestionCache questionCache)
         {
             _dataRepository = dataRepository;
             _questionHubContext = questionHubContext;
+            _cache = questionCache;
         }
 
         [HttpGet]
@@ -53,13 +55,17 @@ namespace QandA.Controllers
         [HttpGet("{questionId}")]
         public async Task<ActionResult<QuestionGetSingleResponse>> GetQuestion(int questionId)
         {
-            var question = await _dataRepository.GetQuestion(questionId);
-
+            var question = _cache.Get(questionId);
             if (question == null)
             {
-                return NotFound();
-            }
+                question = await _dataRepository.GetQuestion(questionId);
+                if (question == null)
+                {
+                    return NotFound();
+                }
 
+                _cache.Set(question);
+            }
             return question;
         }
 
@@ -98,6 +104,8 @@ namespace QandA.Controllers
 
             var savedQuestion = await _dataRepository.PutQuestion(questionId, questionPutRequest);
 
+            _cache.Remove(savedQuestion.QuestionId);
+
             return savedQuestion;
         }
 
@@ -111,6 +119,8 @@ namespace QandA.Controllers
             }
 
             await _dataRepository.DeleteQuestion(questionId);
+
+            _cache.Remove(questionId);
 
             return NoContent();
         }
@@ -134,6 +144,8 @@ namespace QandA.Controllers
                 UserName = "bob.test@test.com",
                 Created = DateTime.UtcNow
             });
+
+            _cache.Remove(answerPostRequest.QuestionId.Value);
 
             await _questionHubContext.Clients.Group(
                 $"Question-{answerPostRequest.QuestionId.Value}")
