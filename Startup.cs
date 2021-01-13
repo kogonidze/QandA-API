@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 using DbUp;
 using QandA.Data;
 using QandA.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using QandA.Authorization;
 
 namespace QandA
 {
@@ -56,6 +60,31 @@ namespace QandA
             services.AddSignalR();
             services.AddMemoryCache();
             services.AddSingleton<IQuestionCache, QuestionCache>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = Configuration["Auth0:Authority"];
+                options.Audience = Configuration["Auth0:Audience"];
+            });
+
+            services.AddHttpClient();
+            services.AddAuthorization(options =>
+                options.AddPolicy("MustBeQuestionAuthor", policy =>
+                    policy.Requirements
+                        .Add(new MustBeQuestionAuthorRequirement())));
+
+            services.AddScoped<
+                IAuthorizationHandler,
+                MustBeQuestionAuthorHandler>();
+
+            services.AddSingleton<
+                IHttpContextAccessor,
+                HttpContextAccessor
+                >();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,7 +101,7 @@ namespace QandA
             }
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
