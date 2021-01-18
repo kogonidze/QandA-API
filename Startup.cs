@@ -44,7 +44,11 @@ namespace QandA
 
             if (upgrader.IsUpgradeRequired())
             {
-                upgrader.PerformUpgrade();
+                var operation = upgrader.PerformUpgrade();
+                if (!operation.Successful)
+                {
+                    var error = operation.Error;
+                }
             }
             services.AddControllers();
 
