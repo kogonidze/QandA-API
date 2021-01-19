@@ -214,5 +214,15 @@ namespace QandA.Data
                     "EXEC dbo.Question_GetUnanswered");
             }
         }
+
+        public async Task<IEnumerable<QuestionGetManyResponse>> GetAnsweredQuestionsAsync()
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                return await connection.QueryAsync<QuestionGetManyResponse>(
+                    "EXEC dbo.Question_GetAnswered");
+            }
+        }
     }
 }
