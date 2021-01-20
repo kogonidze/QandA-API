@@ -101,7 +101,7 @@ VALUES(9, 'How can I represent an Enum in Python?',
 		'2021-01-18 14:58')
 
 INSERT INTO dbo.Question(QuestionId, Title, Content, UserId, UserName, Created)
-VALUES(10, 'different dash in Gnome 3.36.8', 
+VALUES(10, 'Different dash in Gnome 3.36.8', 
 		'recently upgrade to Ubuntu 20.04.1 (from 18.) and then Gnome 3.36.8; i got a dash different than other same set-up in my environment: File icon is a blue drawer, Ubuntu Help is a life buoy, that is no problem but what is bothering is Files duplicating its icon when mounting another partition (icon like a lego piece in a frame) even if the partition is in a Files tab in the main icon; Gnome 3.36.8 has different flavors ? Thanks for your help',
 		'10',
 		'vasili.kotok@test.com',
