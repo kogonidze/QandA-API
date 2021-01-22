@@ -209,6 +209,19 @@ BEGIN
 END
 GO
 
+CREATE PROC dbo.Question_GetAnswered
+AS
+BEGIN
+	SET NOCOUNT ON
+
+	SELECT QuestionId, Title, Content, UserId, UserName, Created
+	FROM dbo.Question q
+	WHERE EXISTS (SELECT *
+	FROM dbo.Answer a
+	WHERE a.QuestionId = q.QuestionId)
+END
+GO
+
 CREATE PROC dbo.Question_Post
 	(
 	@Title nvarchar(100),

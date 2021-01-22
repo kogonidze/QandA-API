@@ -97,6 +97,20 @@ namespace QandA.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("answered")]
+        public async Task<IEnumerable<QuestionGetManyResponse>> GetAnsweredQuestions()
+        {
+            return await _dataRepository.GetAnsweredQuestionsAsync();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("all")]
+        public async Task<IEnumerable<QuestionGetManyResponse>> GetAllQuestions()
+        {
+            return await _dataRepository.GetQuestions();
+        }
+
+        [AllowAnonymous]
         [HttpGet("{questionId}")]
         public async Task<ActionResult<QuestionGetSingleResponse>> GetQuestion(int questionId)
         {
